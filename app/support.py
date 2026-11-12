@@ -385,7 +385,7 @@ def support_router(service, role_for):
         access = role(request)
         token = service.token(request) or secrets.token_hex(32)
         state = service.start(body.message, token, access)
-        response.set_cookie(COOKIE, token, max_age=604800, httponly=True, samesite='strict', secure=request.url.scheme == 'https', path='/api')
+        response.set_cookie(COOKIE, token, max_age=604800, httponly=True, samesite='strict', secure=request.url.scheme == 'https' or service.workflow.settings.public_deployment, path='/api')
         return visible(state)
 
     @router.get('/{session_id}', response_model=SessionView)

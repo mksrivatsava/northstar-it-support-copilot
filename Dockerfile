@@ -10,5 +10,5 @@ COPY --chown=copilot:copilot evals ./evals
 RUN mkdir -p /app/.runtime && chown copilot:copilot /app/.runtime
 USER copilot
 EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"
-CMD ["uvicorn", "app.asgi:app", "--host", "0.0.0.0", "--port", "8000"]
+HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:'+os.getenv('PORT','8000')+'/api/health', timeout=3)"
+CMD ["python", "-m", "app.server"]

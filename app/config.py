@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def load_env():
-    path = ROOT / '.env'
+    path = Path(os.getenv('APP_ENV_FILE', str(ROOT / '.env')))
     if path.exists():
         for line in path.read_text(encoding='utf-8').splitlines():
             if '=' in line and not line.lstrip().startswith('#'):
@@ -45,8 +45,16 @@ class Settings:
     web_total_timeout: float = 20
     database_url: str | None = field(default=None, repr=False)
     database_schema: str = 'northstar'
+    public_deployment: bool = False
+    allowed_hosts: tuple[str, ...] = ('127.0.0.1', 'localhost', 'testserver', '[::1]')
+    demo_requests_per_minute: int = 12
+    demo_global_requests_per_minute: int = 40
+    demo_max_inflight: int = 2
+    enable_retail_api: bool = True
 
     def __post_init__(self):
+        if min(self.demo_requests_per_minute, self.demo_global_requests_per_minute, self.demo_max_inflight) < 1:
+            raise ValueError('Demo request limits must be positive.')
         if self.database_url and self.retrieval_mode == 'sqlite':
             self.retrieval_mode = 'postgres'
         if self.retrieval_mode == 'postgres' and not self.database_url:
@@ -63,6 +71,9 @@ def settings_from_env():
     runtime.mkdir(exist_ok=True)
     key_path = runtime / 'admin-key'
     key = os.getenv('APP_ADMIN_KEY', '').strip()
+    public = os.getenv('PUBLIC_DEPLOYMENT', os.getenv('RENDER', 'false')).lower() in {'true', '1', 'yes'}
+    if public and not key:
+        raise ValueError('Public deployments require a stable APP_ADMIN_KEY in hosting secrets.')
     if not key:
         if not key_path.exists():
             key_path.write_text(secrets.token_urlsafe(32), encoding='utf-8')
@@ -79,6 +90,16 @@ def settings_from_env():
     database_url = os.getenv('DATABASE_URL') or os.getenv('DATABASE_URL_POOLED')
     if backend == 'postgres' and not database_url:
         raise ValueError('DATABASE_URL is required for PostgreSQL persistence')
+    if public and (backend != 'postgres' or not database_url):
+        raise ValueError('Public deployments require PostgreSQL persistence.')
+    allowed_hosts = ['127.0.0.1', 'localhost', '[::1]']
+    if not public:
+        allowed_hosts.append('testserver')
+    allowed_hosts.extend(host.strip() for host in os.getenv('ALLOWED_HOSTS', '').split(',') if host.strip())
+    if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
+        allowed_hosts.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
+    if public and len(allowed_hosts) == 3:
+        raise ValueError('Set ALLOWED_HOSTS or RENDER_EXTERNAL_HOSTNAME for a public deployment.')
     gemini_key = os.getenv('GEMINI_API_KEY', '')
     pinecone_key = os.getenv('PINECONE_API_KEY', '')
     if (mode == 'gemini' or retrieval == 'pinecone') and not gemini_key:
@@ -111,4 +132,9 @@ def settings_from_env():
                     web_request_timeout=float(os.getenv('WEB_REQUEST_TIMEOUT', '10')),
                     web_total_timeout=float(os.getenv('WEB_TOTAL_TIMEOUT', '20')),
                     database_url=database_url if backend == 'postgres' else None,
-                    database_schema=os.getenv('POSTGRES_SCHEMA', 'northstar'))
+                    database_schema=os.getenv('POSTGRES_SCHEMA', 'northstar'),
+                    public_deployment=public, allowed_hosts=tuple(dict.fromkeys(allowed_hosts)),
+                    demo_requests_per_minute=int(os.getenv('DEMO_REQUESTS_PER_MINUTE', '12')),
+                    demo_global_requests_per_minute=int(os.getenv('DEMO_GLOBAL_REQUESTS_PER_MINUTE', '40')),
+                    demo_max_inflight=int(os.getenv('DEMO_MAX_INFLIGHT', '2')),
+                    enable_retail_api=os.getenv('ENABLE_RETAIL_API', 'false' if public else 'true').lower() in {'true', '1', 'yes'})

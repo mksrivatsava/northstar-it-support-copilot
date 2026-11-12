@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Northstar \u00b7 Internal IT Support Copilot",
-    "description": "Grounded IT answers, browser-owned guided troubleshooting sessions and explicit local service-desk tickets. Employee knowledge access is unauthenticated on loopback; admin operations require X-Admin-Key. No external ticket writes.",
+    "description": "Grounded IT answers, browser-owned guided troubleshooting sessions and explicit demo service-desk tickets. Employee demo access is unauthenticated; admin operations require X-Admin-Key. Public hosting adds request limits and secure cookies. No external ticket writes.",
     "version": "0.7.0"
   },
   "paths": {

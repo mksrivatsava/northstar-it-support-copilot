@@ -2,6 +2,14 @@
 .venv
 .runtime
 .env
+.env.*
+.neon
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.pem
+*.key
 __pycache__
 .pytest_cache
 tests

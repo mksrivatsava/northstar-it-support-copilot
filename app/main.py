@@ -4,7 +4,7 @@ import hmac
 from typing import Literal
 
 from fastapi import FastAPI, File, Form, Header, HTTPException, UploadFile, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 from starlette.middleware.trustedhost import TrustedHostMiddleware
@@ -16,6 +16,7 @@ from app.workflow import Workflow
 from app.cloud import ProviderError
 from app.retail import retail_router
 from app.support import SupportSessions, support_router
+from app.demo_limits import DemoLimits
 
 
 class ChatInput(BaseModel):
@@ -112,9 +113,10 @@ def create_app(settings: Settings | None = None, seed=True):
             if hasattr(store, 'close'):
                 store.close()
     app = FastAPI(title='Northstar · Internal IT Support Copilot', version='0.7.0', lifespan=lifespan,
-                  description='Grounded IT answers, browser-owned guided troubleshooting sessions and explicit local service-desk tickets. Employee knowledge access is unauthenticated on loopback; admin operations require X-Admin-Key. No external ticket writes.')
+                  description='Grounded IT answers, browser-owned guided troubleshooting sessions and explicit demo service-desk tickets. Employee demo access is unauthenticated; admin operations require X-Admin-Key. Public hosting adds request limits and secure cookies. No external ticket writes.')
     app.state.store, app.state.workflow, app.state.settings = store, workflow, settings
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver', '[::1]'])
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(settings.allowed_hosts))
+    limits = DemoLimits(settings.demo_requests_per_minute, settings.demo_global_requests_per_minute, settings.demo_max_inflight)
 
     def role_for(key):
         if key is None:
@@ -133,7 +135,21 @@ def create_app(settings: Settings | None = None, seed=True):
 
     @app.middleware('http')
     async def headers(request, call_next):
-        response = await call_next(request)
+        limited = settings.public_deployment and request.method == 'POST' and (
+            request.url.path == '/api/chat' or request.url.path == '/api/support/sessions' or
+            (request.url.path.startswith('/api/support/sessions/') and request.url.path.endswith('/messages')))
+        admitted = False
+        try:
+            rejection = limits.begin(request.client.host if request.client else 'unknown') if limited else None
+            if rejection:
+                status, delay = rejection
+                response = JSONResponse({'detail': 'The shared demo is busy. Please retry shortly.'}, status_code=status, headers={'Retry-After': str(delay)})
+            else:
+                admitted = limited
+                response = await call_next(request)
+        finally:
+            if admitted:
+                limits.finish()
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Referrer-Policy'] = 'no-referrer'
         response.headers['Cache-Control'] = 'no-store'
@@ -144,7 +160,7 @@ def create_app(settings: Settings | None = None, seed=True):
 
     @app.get('/api/health', tags=['System'])
     def health():
-        return {'status': 'ok', 'answer_mode': settings.answer_mode,
+        return {'status': 'ok', 'public_demo': settings.public_deployment, 'answer_mode': settings.answer_mode,
                 'retrieval': 'pinecone' if settings.retrieval_mode == 'pinecone' else ('postgres_fts' if store.backend == 'postgres' else 'sqlite_fts5_bm25'),
                 'persistence': store.backend,
                 'workflow': 'langgraph', 'live_search': bool(settings.web_search_enabled and settings.tavily_api_key),
@@ -263,7 +279,8 @@ def create_app(settings: Settings | None = None, seed=True):
         store.save_evaluation(report)
         return report
 
-    app.include_router(retail_router(store))
+    if settings.enable_retail_api:
+        app.include_router(retail_router(store))
     app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
     @app.get('/', include_in_schema=False)

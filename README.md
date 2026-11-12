@@ -4,6 +4,8 @@
 
 This workspace is now running on Neon. **144 automated tests passed**, including real PostgreSQL branch tests. The live Gemini/Pinecone acceptance check verified the migrated ticket and completed a new resolved troubleshooting session against PostgreSQL without creating another ticket. See [validation evidence](docs/validation.md).
 
+For public hosting, use the free-plan [Render Blueprint](render.yaml) and [Render deployment guide](docs/render.md). Hosting support adds dynamic port/hostname configuration, secure cookies, a private secret-file option and basic public-demo request limits.
+
 **Your Internal IT Partner.** Version 0.6 restores IT support as the main app and adds saved guided troubleshooting for Teams microphone, VPN, and account access. Retail is removed from the UI; its earlier backend, data and tests are retained separately.
 
 Start with **Fix a Teams issue**, select your operating system, and use **Tried it — still not working** to advance through verified runbook steps. The app remembers your answers and attempted steps after reload. Choose **Review ticket & escalate** to inspect the handoff, then **Create local ticket**. An IT administrator can open its full handoff from **Activity & tickets**. Tickets stay local and do not contact an external support team. See the [guided troubleshooting guide](docs/guided-support.md).
