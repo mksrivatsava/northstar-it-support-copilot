@@ -1,0 +1,10 @@
+version: 1
+name: Tavily public vendor search fixture
+slug: tavily-vendor-search
+protocol: http
+port: 4015
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

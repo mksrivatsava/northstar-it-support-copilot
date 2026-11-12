@@ -1,0 +1,12 @@
+simulation: northstar-cloud
+routing: path
+mocks:
+  - name: Gemini contract fixture
+    routeKey: gemini
+    path: ../../mocks/gemini/config.yaml
+  - name: Pinecone contract fixture
+    routeKey: pinecone
+    path: ../../mocks/pinecone/config.yaml
+  - name: Tavily vendor search fixture
+    routeKey: tavily
+    path: ../../mocks/tavily/config.yaml

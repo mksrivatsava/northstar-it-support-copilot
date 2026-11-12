@@ -1,0 +1,9 @@
+sku,product_name,on_hand,reserved,on_order,lead_time_days
+NS-COFFEE-250,House blend coffee 250g,18,3,0,10
+NS-MUG-BLUE,Blue ceramic mug,28,0,0,7
+NS-TEA-100,Breakfast tea 100g,160,10,0,14
+NS-FILTER-100,Coffee filters 100 pack,0,0,0,7
+NS-BOTTLE-750,Steel bottle 750ml,8,0,40,14
+NS-GIFT-TIN,Seasonal gift tin,30,0,0,10
+NS-NEW-SKU,New seasonal product,12,0,0,
+NS-TRAVEL-CUP,Travel cup,90,0,0,7

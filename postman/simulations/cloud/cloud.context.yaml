@@ -1,0 +1,66 @@
+purpose:
+  stands_in_for: Gemini embedding and structured generation, Pinecone control/vector APIs, and Tavily public vendor search.
+  unblocks: HTTP contract and fault checks without live provider calls, keys, or model downloads.
+assumptions:
+  - id: provider-request-shapes
+    status: supported
+    claim: The embedding, generation, index, upsert, and query request shapes used by this adapter are accepted in the specific live scenarios run.
+    reason: Fifteen chunks synced and five live acceptance checks completed against the real providers.
+    verification: On 2026-11-11, provisioned the dedicated 768-dimensional cosine index and synced 15 Gemini-embedded sections. Five live checks passed; broader evaluation passed 14 of 16 with documented limits.
+    source: docs/cloud-contracts.md; scripts/setup_cloud.py; scripts/smoke_cloud.py; docs/validation.md
+    updated_at: '2026-11-11'
+  - id: fail-closed-cloud-behavior
+    status: supported
+    claim: The caller withholds unsupported answers on tested provider failures and rejects tested unauthorized or stale remote candidates. Version 0.3 reports provider failures as error rather than an evidence-gap abstention.
+    reason: Real application code ran through HTTPX against the two local fixture services and returned the asserted outcomes.
+    verification: The cloud upgrade suite passed 52 tests. The version 0.3 timeout-recovery suite passed 60 tests. Fixture request events showed embedding, generation, control, upsert, query, and delete paths. These fixtures are authored scenarios and do not establish every provider failure mode.
+    source: tests/test_cloud_integration.py; postman/mocks/gemini/default.js; postman/mocks/pinecone/default.js
+    updated_at: '2026-11-11'
+  - id: structured-citation-rendering
+    status: supported
+    claim: Gemini may return valid structured source IDs without inline source markers in an otherwise supported answer.
+    reason: This occurred in actual VPN and password responses. Source IDs were in range, but inline-reference-only validation rejected them.
+    verification: Inspected one synthetic live response and added regression tests for a source footer and preservation of original citation numbering. Citation-ID validity does not establish claim-level entailment.
+    source: app/cloud.py; tests/test_cloud_integration.py; docs/validation.md
+    updated_at: '2026-11-11'
+  - id: generation-retry-recovery
+    status: supported
+    claim: In the simulated scenarios run, the caller recovers after an initial timeout, 503, or short 429 and stops after bounded failures without retrying a 403 or shortening a long Retry-After.
+    reason: Application outcomes, provider attempt metadata, and fixture generation counters matched the expected outcomes over actual HTTP.
+    verification: On 2026-11-11, the full 60-test suite passed. Eight new tests exercised recovery, exhaustion, deadline cancellation, cooldown, permanent errors, and evidence-gap distinction. Real-provider outage recovery remains outside what a fixture can guarantee.
+    source: tests/test_cloud_integration.py; app/cloud.py; docs/validation.md
+    updated_at: '2026-11-11'
+  - id: scoped-public-query-projection
+    status: supported
+    claim: In the tested routes, Tavily receives only a fixed public product/topic query and vendor domain list, not the original question or private evidence.
+    reason: HTTP fixture request inspection showed no synthetic employee address, private hostname, device identifier, or local document content in the search body. Guarded questions made no Tavily requests.
+    verification: On 2026-11-11 the full 90-test suite passed, including 30 web-search tests. Tests exercised current vendor routing, private success, guarded topics, raw-question projection, weak-evidence fallback, and fallback after a private assessment rejected evidence.
+    source: tests/test_web_search.py; app/web_search.py; docs/validation.md
+    updated_at: '2026-11-11'
+  - id: tavily-live-contract
+    status: supported
+    claim: The tested Tavily Search request using Bearer authentication, basic search, and official-domain filtering succeeded with the supplied credential.
+    reason: A live HTTP 200 credential probe and an end-to-end public guidance run returned Microsoft support references. The application retained only an approved support article and Gemini cited it.
+    verification: The live two-case smoke run passed. Publication dates are optional and search snippets do not establish live tenant-specific service status. Provider outages and future quota availability remain unverified.
+    source: scripts/check_tavily.py; scripts/smoke_web.py; docs/web-search.md; docs/validation.md
+    updated_at: '2026-11-11'
+  - id: free-tier-availability
+    status: unknown
+    claim: All future requests will remain available within a free provider quota.
+    reason: Credentials and tested calls worked, but no billing-plan or future-quota guarantee was established.
+    verification: No account plan was changed, and no billing resources were enabled. Check the provider account for current quota and usage.
+    source: docs/cloud-setup.md
+    updated_at: '2026-11-11'
+fingerprints:
+  - id: cloud-upgrade-local
+    date: '2026-11-11'
+    commit: uncommitted local cloud upgrade
+    cli: Postman CLI 1.75.0
+  - id: timeout-recovery-v03
+    date: '2026-11-11'
+    commit: uncommitted local timeout recovery changes
+    cli: Postman CLI 1.75.0
+  - id: public-search-v04
+    date: '2026-11-11'
+    commit: uncommitted local Tavily vendor search integration
+    cli: Postman CLI 1.75.0

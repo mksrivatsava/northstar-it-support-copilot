@@ -1,0 +1,10 @@
+version: 1
+name: Ollama chat contract subset
+slug: ollama-chat-contract-subset
+protocol: http
+port: 4011
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

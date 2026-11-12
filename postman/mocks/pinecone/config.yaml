@@ -1,0 +1,10 @@
+version: 1
+name: Pinecone vector contract fixture
+slug: pinecone-vector-contract
+protocol: http
+port: 4014
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

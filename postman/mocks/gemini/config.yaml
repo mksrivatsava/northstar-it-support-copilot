@@ -1,0 +1,10 @@
+version: 1
+name: Gemini cloud contract fixture
+slug: gemini-cloud-contract
+protocol: http
+port: 4013
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

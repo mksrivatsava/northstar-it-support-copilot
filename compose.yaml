@@ -1,0 +1,12 @@
+services:
+  copilot:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      ANSWER_MODE: extractive
+    volumes:
+      - copilot-data:/app/.runtime
+    restart: unless-stopped
+volumes:
+  copilot-data:

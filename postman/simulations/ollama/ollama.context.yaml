@@ -1,0 +1,30 @@
+purpose:
+  stands_in_for: Ollama non-streaming chat API used by the optional answer generator.
+  unblocks: Real HTTP adapter checks without installing or running an LLM.
+assumptions:
+  - id: non-streaming-content-field
+    status: supported
+    claim: The documented non-streaming chat response contains message.content as text.
+    reason: The provider documentation describes this field; the adapter validates its type.
+    verification: Read official chat API documentation on 2026-11-11. A local HTTP fixture exercising this subset produced an Ollama-labeled response through the real application. Real model output remains unverified.
+    source: https://docs.ollama.com/api/chat; docs/ollama-contract.json; tests/test_provider_integration.py
+    updated_at: '2026-11-11'
+  - id: caller-fallback-under-injected-failures
+    status: supported
+    claim: In the eight scenarios run, the caller generated with a valid cited response and fell back to original excerpts for HTTP 500, HTTP 404, invalid JSON, non-string content, invalid citations, missing citations, and timeout.
+    reason: Application HTTP responses reported the expected generation_mode and preserved source citations in every case.
+    verification: On 2026-11-11, Postman CLI 1.75.0 simulation served eight POST /api/chat requests. The full suite passed 31 tests. Request events confirmed 200, 500, 404 and malformed-response paths; the delayed fixture served after about 508 ms while the caller timed out at 150 ms. No real model ran.
+    source: tests/test_provider_integration.py; postman/mocks/ollama/default.js; docs/validation.md
+    updated_at: '2026-11-11'
+  - id: real-model-grounding
+    status: unknown
+    claim: A configured real local model faithfully summarizes the retrieved evidence and follows citation instructions.
+    reason: Fixture responses are authored test data and cannot establish generative quality or injection resistance.
+    verification: No live Ollama model was installed or run. Verify against an installed model and a human-labeled dataset before relying on generated answers.
+    source: app/workflow.py; docs/provider-testing.md
+    updated_at: '2026-11-11'
+fingerprints:
+  - id: initial-local-build
+    date: '2026-11-11'
+    commit: uncommitted initial project implementation
+    cli: Postman CLI 1.75.0

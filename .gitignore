@@ -1,0 +1,16 @@
+.venv/
+.env
+.env.*
+!.env.example
+.runtime/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.log
+.neon
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.pem
+*.key

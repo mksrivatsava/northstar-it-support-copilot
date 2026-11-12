@@ -1,0 +1,14 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Ollama chat contract subset", "version": "1.0.0", "description": "Subset used by this adapter; sourced from https://docs.ollama.com/api/chat. Mock outputs are test fixtures, not model-quality evidence."},
+  "servers": [{"url": "http://127.0.0.1:11434"}],
+  "paths": {"/api/chat": {"post": {
+    "operationId": "chat",
+    "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["model", "messages", "stream"], "properties": {"model": {"type": "string"}, "messages": {"type": "array", "items": {"type": "object"}}, "stream": {"type": "boolean"}, "options": {"type": "object"}}}}}},
+    "responses": {
+      "200": {"description": "Completed non-streaming chat", "content": {"application/json": {"schema": {"type": "object", "properties": {"message": {"type": "object", "properties": {"content": {"type": "string"}}}}}, "example": {"message": {"role": "assistant", "content": "Open the Northstar VPN client and select the Corporate gateway. [1]"}, "done": true}}}},
+      "404": {"description": "Model not found", "content": {"application/json": {"example": {"error": "model not found"}}}},
+      "500": {"description": "Server failure", "content": {"application/json": {"example": {"error": "server failure"}}}}
+    }
+  }}}
+}
