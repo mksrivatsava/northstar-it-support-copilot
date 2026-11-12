@@ -1,5 +1,9 @@
 # Northstar Internal IT Support Copilot
 
+**Live demo:** [northstar-it-support-copilot.onrender.com](https://northstar-it-support-copilot.onrender.com)
+
+Hosted on Render's free web-service plan in Singapore with Neon PostgreSQL. The service may take about a minute to wake after inactivity. Use fictional issues only; demo tickets remain in the app and do not notify an external IT team. The live HTTPS acceptance check passed grounded Gemini/Pinecone answers, guided follow-ups, ticket handoff, session isolation and admin boundaries.
+
 **Version 0.7 adds Neon PostgreSQL persistence.** Sessions, tickets, documents and vector metadata can survive host restarts and redeploys. The SQLite importer preserves existing IDs and corpus identity, verifies every copied record, and keeps a local backup. See [PostgreSQL setup and migration](docs/postgres.md).
 
 This workspace is now running on Neon. **144 automated tests passed**, including real PostgreSQL branch tests. The live Gemini/Pinecone acceptance check verified the migrated ticket and completed a new resolved troubleshooting session against PostgreSQL without creating another ticket. See [validation evidence](docs/validation.md).

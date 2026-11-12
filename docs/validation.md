@@ -1,5 +1,15 @@
 # Validation evidence
 
+## Render deployment · 12 November 2026
+
+The application was deployed successfully to **https://northstar-it-support-copilot.onrender.com** from the private `mksrivatsava/northstar-it-support-copilot` repository. Render service `srv-dbqvom0u01pc73d3cceg` uses the **free** plan in **Singapore**, Docker runtime and the existing Neon production schema. The initial application deploy `dep-dbqvomou01pc73d3cejg` reached `live` on commit `1d1d170`. Render's secret-file support supplies selected runtime credentials privately; no secret values were added to Git or command arguments.
+
+The 44 targeted hosting/support/API checks passed, including five new hosting cases. GitHub Actions also passed the release's offline CI workflow. Render accepted and validated the deployment Blueprint. Added checks cover public hostname allowlisting, Secure/HttpOnly/SameSite cookies behind TLS termination, stable admin/PostgreSQL requirements, private environment-file loading, request/concurrency admission limits and disabling the archived retail API in public mode.
+
+The live HTTPS acceptance script passed all eight acceptance groups: app HTML/security headers; Neon/Gemini/Pinecone runtime configuration; admin/restricted-document boundaries; **15/15** existing vector-sync records; a real Gemini answer citing internal `collaboration.md`; secure cookie/session isolation; guided progress with saved context; and explicit/idempotent ticket creation with admin-readable immutable evidence. The observed RAG response took approximately **7.7 seconds**. Demo ticket **IT-2FD074E2** contains the Windows context, unsuccessful device-selection step, synthetic incident details, conversation and references. No external support system was contacted. Evidence is `.runtime/render-smoke.json`; the reproducible command is in [Render setup](render.md).
+
+An initial synthetic probe used the words “live deployment test”, which matched the existing freshness heuristic, invoked the approved public-search path, and abstained when Tavily returned no approved references. The normal internal troubleshooting probe subsequently passed. This does not establish public-search coverage or arbitrary conversational accuracy. Browser visual verification was unavailable because the local computer-use helper failed to initialize; verification used actual HTTPS requests, headers, sessions, citations and persisted ticket data. Render free-tier sleep and provider latency/quotas still apply.
+
 ## Neon PostgreSQL migration · 12 November 2026 · version 0.7
 
 The complete suite passed **144 tests** (exit code 0), including eight added PostgreSQL/migration checks. PostgreSQL cases connected to the real isolated Neon branch `codex-postgres-migration-20261112`, using unique disposable test schemas. Existing provider tests used the local Postman Gemini/Pinecone/Tavily and Ollama HTTP simulations. The PostgreSQL fixed support evaluator passed **16/16** cases. JUnit evidence is `.runtime/neon-tests.xml`. One existing non-failing Starlette/AnyIO deprecation warning remains; dependency consistency and JavaScript syntax checks passed.

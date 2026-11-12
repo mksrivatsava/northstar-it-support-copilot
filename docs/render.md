@@ -1,5 +1,7 @@
 # Render deployment with Neon
 
+The deployed demo is **https://northstar-it-support-copilot.onrender.com**, backed by the existing Neon production app schema. Render service: `srv-dbqvom0u01pc73d3cceg`; plan: **free**; region: **Singapore**. Its dashboard is https://dashboard.render.com/web/srv-dbqvom0u01pc73d3cceg.
+
 The repository includes a free-plan Docker Blueprint in `render.yaml`. It uses the existing Neon PostgreSQL database and Gemini/Pinecone configuration; no Render database or persistent disk is required. The free web service can sleep after inactivity and take time to start on the next visit.
 
 ## Hosting configuration
@@ -29,3 +31,13 @@ The public request guard defaults to 12 accepted chat/session-message requests p
 7. Exercise a cited Teams troubleshooting session, follow-up progression, explicit ticket preview/creation, cookie isolation and admin boundaries over the HTTPS live URL. Check the ticket and session remain available through Neon after subsequent requests.
 
 Render account authorization and repository integration belong to the user's account. Paid-plan upgrades, billing setup and public DNS/domain changes are not part of the free deployment. A working local app or a successful build alone is not evidence of a working live URL.
+
+## Reproduce the HTTPS acceptance check
+
+From the local workspace with the matching ignored admin configuration:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/smoke_render.py --base-url https://northstar-it-support-copilot.onrender.com
+```
+
+This intentionally creates one clearly labeled synthetic support session and one demo ticket. It checks the rendered HTML/headers over HTTPS, actual Gemini/Pinecone answer and citation, PostgreSQL/index configuration, secure cookies, follow-up progression, private-session isolation, restricted documents, admin authorization and idempotent ticket creation. It does not automate a visual browser walkthrough. The sanitized report is `.runtime/render-smoke.json`; it contains no credentials or ownership cookie.
